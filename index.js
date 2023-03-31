@@ -6,6 +6,7 @@ const authRoute = require("./src/routes/auth.routes");
 const productRoute = require("./src/routes/product.routes");
 const trainingRoute = require("./src/routes/training.routes");
 const userRoute = require("./src/routes/userAccount.routes");
+const commentRoute = require("./src/routes/comment.routes");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -34,3 +35,4 @@ authRoute(app)
 userRoute(app)
 productRoute(app)
 trainingRoute(app)
+commentRoute(app)

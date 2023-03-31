@@ -1,7 +1,7 @@
 const { mongoose } = require("mongoose");
 
 const commentSchema = mongoose.Schema({
-    comment:{type: String},
+    comment:{type: String, required:true},
     training: {type: mongoose.Schema.Types.ObjectId, ref:"Training", required:true},
     commentedBy: {type: mongoose.Schema.Types.ObjectId, required:true,},
 },{

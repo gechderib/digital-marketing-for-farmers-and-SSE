@@ -29,8 +29,11 @@ const changeProduct = async (req, res, next) => {
 
 const changeComment = async (req, res, next) => {
   try{
-    const comment = await CommentModel.findOne({commentedBy: req.userId})
+    const {commentId} = req.params
+    const comment = await CommentModel.findOne({commentedBy: req.userId, _id:commentId})
     const adminUser = await RegisterModel.findOne({_id: req.userId, roles:"admin"})
+    console.log(comment)
+    console.log(adminUser)
     if(comment || adminUser){
       next();
       return
