@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 mongoose
-  .connect(dbConfig.url, {
+  .connect(dbConfig.urlAtlas, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
