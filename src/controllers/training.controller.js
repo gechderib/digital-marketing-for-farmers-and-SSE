@@ -1,3 +1,4 @@
+const CommentModel = require("../models/comments.model");
 const TrainingModel = require("../models/training.model");
 
 const addTraining = async (req, res) => {
@@ -74,7 +75,8 @@ const deletTraining = async (req, res) => {
   try {
     const { id } = req.params;
     const response = await TrainingModel.deleteOne({ _id: id });
-    if (response) {
+    const comment = await CommentModel.deleteMany({training: id})
+    if (response && comment) {
       res.status(200).send({ message: "data is successfully deleted" });
       return;
     }
@@ -93,3 +95,6 @@ module.exports = {
   updateTraining,
   deletTraining,
 };
+
+
+//

@@ -70,7 +70,7 @@ const changeMessage = async (req, res, next) => {
         next();
         return;
       }
-      res.status(400).send({ message: "message not found" });
+      res.status(400).send({ message: "you can only change your message" });
       return;
     } else {
       res.status(401).send({ message: "wrong id" });
