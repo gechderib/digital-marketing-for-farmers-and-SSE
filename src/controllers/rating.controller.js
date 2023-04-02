@@ -31,23 +31,28 @@ const giveRate = async (req, res) => {
 
 const getYourRate = async (req, res) => {
   try {
-    const {productOwnerId} = req.params
-    const yourRate = await RatingModel.aggregate([
-      { $match: { productOwner: new ObjectId(productOwnerId) } },
-      {
-        $group: {
-          _id: null,
-          averageRate: { $avg: "$rate" },
-          count: { $sum: 1 },
+    const { productOwnerId } = req.params;
+    if (ObjectId.isValid(productOwnerId)) {
+      const yourRate = await RatingModel.aggregate([
+        { $match: { productOwner: new ObjectId(productOwnerId) } },
+        {
+          $group: {
+            _id: null,
+            averageRate: { $avg: "$rate" },
+            count: { $sum: 1 },
+          },
         },
-      },
-    ]);
-    if (yourRate[0]) {
-      res.status(200).send(yourRate[0]);
+      ]);
+      if (yourRate[0]) {
+        res.status(200).send(yourRate[0]);
+        return;
+      }
+      res.status(400).send({ message: "rate note found" });
+      return;
+    } else {
+      res.status(400).send({ message: "wrong id" });
       return;
     }
-    res.status(400).send({ message: "rate note found" });
-    return;
   } catch (err) {
     res.status(500).send({ message: err.message });
     return;

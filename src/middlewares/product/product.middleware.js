@@ -4,6 +4,7 @@ const UserModel = require("../../models/auth/signup.model");
 const CommentModel = require("../../models/comments.model");
 const MessageModel = require("../../models/message.model");
 const ProductModel = require("../../models/product.model");
+const RatingModel = require("../../models/rating.model");
 
 const changeProduct = async (req, res, next) => {
   try {
@@ -82,6 +83,32 @@ const changeMessage = async (req, res, next) => {
   }
 };
 
+
+const changeRate = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    if (ObjectId.isValid(id)) {
+      const response = await RatingModel.findOne({
+        _id: id,
+        ratedBy: req.userId,
+      });
+      const adminUser = await adminUser.findOne({_id:req.userId, roles:"admin"});
+      if (response || adminUser) {
+        next();
+        return;
+      }
+      res.status(400).send({ message: "you can only change your message" });
+      return;
+    } else {
+      res.status(401).send({ message: "wrong id" });
+      return;
+    }
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+    return;
+  }
+};
+
 const canAddProduct = async (req, res, next) => {
   try {
     const user = await UserModel.findOne({
@@ -101,7 +128,7 @@ const canAddProduct = async (req, res, next) => {
   }
 };
 
-module.exports = { changeProduct, canAddProduct, changeComment, changeMessage };
+module.exports = { changeProduct, canAddProduct, changeComment, changeMessage, changeRate };
 
 /// training content by admin with comment
 /// rating the product owner
