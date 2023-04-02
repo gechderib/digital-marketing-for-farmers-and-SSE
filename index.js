@@ -8,6 +8,7 @@ const trainingRoute = require("./src/routes/training.routes");
 const userRoute = require("./src/routes/userAccount.routes");
 const commentRoute = require("./src/routes/comment.routes");
 const messageRoutes = require("./src/routes/message.routes");
+const ratingRoute = require("./src/routes/rating.route");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -16,7 +17,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 mongoose
-  .connect(dbConfig.urlAtlas, {
+  .connect(dbConfig.url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -31,10 +32,10 @@ mongoose
     process.exit();
   });
 
-
 authRoute(app)
 userRoute(app)
 productRoute(app)
 trainingRoute(app)
 commentRoute(app)
 messageRoutes(app)
+ratingRoute(app)
