@@ -8,27 +8,12 @@ const productSchema = mongoose.Schema(
     photo: { type: String },
     amount: { type: Number, required: true},
     soldout: { type: Boolean, default:false,},
-    postedBy: { type: mongoose.Schema.Types.ObjectId, required: true },
+    postedBy: { type: mongoose.Schema.Types.ObjectId, required: true, ref:"User" },
   },
   {
-    toJSON: { virtuals: true },
     timestamps: true,
   },
 );
-
-productSchema.virtual("fromUser", {
-  ref: "User",
-  localField: "postedBy",
-  foreignField: "_id",
-  justOne: true,
-});
-
-productSchema.virtual("fromAdminUser", {
-  ref: "AdminUser",
-  localField: "postedBy",
-  foreignField: "_id",
-  justOne: true,
-});
 
 
 const ProductModel = mongoose.model("Product", productSchema);

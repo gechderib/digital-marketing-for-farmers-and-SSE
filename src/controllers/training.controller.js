@@ -3,7 +3,10 @@ const TrainingModel = require("../models/training.model");
 
 const addTraining = async (req, res) => {
   try {
-    const newTraining = new TrainingModel(req.body);
+    const newTraining = new TrainingModel({
+      ...req.body,
+      postedBy: req.userId,
+    });
     const response = await newTraining.save();
     if (response) {
       res.status(201).send({ message: "Training successfully added" });
@@ -22,6 +25,7 @@ const getTrainings = async (req, res) => {
     const page = req.query.p || 0;
     const trainingPerPage = 5;
     const response = await TrainingModel.find({})
+      .populate("postedBy")
       .skip(page * trainingPerPage)
       .limit(trainingPerPage);
     if (response) {
@@ -39,7 +43,7 @@ const getTrainings = async (req, res) => {
 const getTraining = async (req, res) => {
   try {
     const { id } = req.params;
-    const response = await TrainingModel.findById(id);
+    const response = await TrainingModel.findById(id).populate("postedBy");
     if (response) {
       res.status(200).send(response);
       return;
@@ -75,7 +79,7 @@ const deletTraining = async (req, res) => {
   try {
     const { id } = req.params;
     const response = await TrainingModel.deleteOne({ _id: id });
-    const comment = await CommentModel.deleteMany({training: id})
+    const comment = await CommentModel.deleteMany({ training: id });
     if (response && comment) {
       res.status(200).send({ message: "data is successfully deleted" });
       return;
@@ -95,6 +99,5 @@ module.exports = {
   updateTraining,
   deletTraining,
 };
-
 
 //

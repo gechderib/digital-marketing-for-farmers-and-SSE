@@ -22,8 +22,8 @@ const addComment = async (req, res) => {
 const getComments = async (req, res) => {
   try {
     const comments = await CommentModel.find({})
-      .populate("fromUser")
-      .populate("fromAdminUser").populate("training");
+      .populate("commentedBy")
+      .populate("training");
     if (comments) {
       res.status(200).send(comments);
       return;
@@ -56,8 +56,8 @@ const getSingleTrainingComments = async (req, res) => {
   try {
     const { trainingId } = req.params;
     const response = await CommentModel.find({ training: trainingId })
-      .populate("fromUser")
-      .populate("fromAdminUser");
+      .populate("commentedBy")
+      
     if (response) {
       res.status(200).send(response);
       return;

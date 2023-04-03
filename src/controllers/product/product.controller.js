@@ -1,5 +1,4 @@
 const { ObjectId } = require("mongodb");
-const RegisterModel = require("../../models/auth/register.model");
 const ProductModel = require("../../models/product.model");
 
 const addProduct = async (req, res) => {
@@ -10,7 +9,7 @@ const addProduct = async (req, res) => {
       res.status(201).send({ message: "product successfully added" });
       return;
     }
-    res.status(400).send({ message: "cant add the product" });
+    res.status(400).send({ message: "can't add the product" });
   } catch (err) {
     res.status(500).send({ message: err.message });
     return;
@@ -22,8 +21,7 @@ const getAllProducts = async (req, res) => {
   const productsPerPage = 5;
   try {
     const response = await ProductModel.find({})
-      .populate("fromAdminUser")
-      .populate("fromUser")
+      .populate("postedBy")
       .skip(page * productsPerPage)
       .limit(productsPerPage);
     if (response) {
@@ -39,12 +37,13 @@ const getAllProducts = async (req, res) => {
 };
 
 const getProduct = async (req, res) => {
+  
   try {
     const { id } = req.params;
+    
     if (ObjectId.isValid(id)) {
       const response = await ProductModel.findById(id)
-        .populate("fromAdminUser")
-        .populate("fromUser");
+        .populate("postedBy");
       if (response) {
         res.status(200).send(response);
         return;
@@ -63,8 +62,7 @@ const getProduct = async (req, res) => {
 const getMyProduct = async (req, res) => {
   try {
     const myProduct = await ProductModel.find({ postedBy: req.userId })
-      .populate("fromUser")
-      .populate("fromAdminUser");
+      .populate("postedBy");
     if (myProduct.length > 0) {
       res.status(200).send(myProduct);
       return;

@@ -31,10 +31,8 @@ const sendMessage = async (req, res) => {
 const getMessages = async (req, res) => {
   try {
     const messages = await MessageModel.find({})
-      .populate("senderFromUser")
-      .populate("senderFromAdminUser")
-      .populate("recieverFromUser")
-      .populate("recieverFromAdminUser");
+      .populate("sender")
+      .populate("reciever");
     if (response) {
       res.status(200).send(messages);
       return;

@@ -1,10 +1,32 @@
 const { ObjectId } = require("mongodb");
-const RegisterModel = require("../../models/auth/register.model");
 const UserModel = require("../../models/auth/signup.model");
 const CommentModel = require("../../models/comments.model");
 const MessageModel = require("../../models/message.model");
 const ProductModel = require("../../models/product.model");
 const RatingModel = require("../../models/rating.model");
+
+const changeUserAccount = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const user = await UserModel.findOne({
+      $or: [
+        { $and: [{ _id: req.userId }, { _id: id }] },
+        { $and: [{ _id: req.userId }, { roles: "admin" }] },
+      ],
+    });
+    if (user) {
+      next();
+      return;
+    }
+    res
+      .status(400)
+      .send({ message: "only account owner and admin can chenge the account" });
+    return;
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+    return;
+  }
+};
 
 const changeProduct = async (req, res, next) => {
   try {
@@ -13,7 +35,7 @@ const changeProduct = async (req, res, next) => {
       _id: id,
       postedBy: req.userId,
     });
-    const adminUser = await RegisterModel.findOne({
+    const adminUser = await UserModel.findOne({
       _id: req.userId,
       roles: "admin",
     });
@@ -36,16 +58,12 @@ const changeComment = async (req, res, next) => {
   try {
     const { commentId } = req.params;
     const comment = await CommentModel.findOne({
-      commentedBy: req.userId,
-      _id: commentId,
+      $or: [
+        { $and: [{ commentedBy: req.userId }, { _id: commentId }] },
+        { $and: [{ _id: req.userId }, { roles: "admin" }] },
+      ],
     });
-    const adminUser = await RegisterModel.findOne({
-      _id: req.userId,
-      roles: "admin",
-    });
-    console.log(comment);
-    console.log(adminUser);
-    if (comment || adminUser) {
+    if (comment) {
       next();
       return;
     }
@@ -83,7 +101,6 @@ const changeMessage = async (req, res, next) => {
   }
 };
 
-
 const changeRate = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -92,7 +109,10 @@ const changeRate = async (req, res, next) => {
         _id: id,
         ratedBy: req.userId,
       });
-      const adminUser = await adminUser.findOne({_id:req.userId, roles:"admin"});
+      const adminUser = await UserModel.findOne({
+        _id: req.userId,
+        roles: "admin",
+      });
       if (response || adminUser) {
         next();
         return;
@@ -128,7 +148,14 @@ const canAddProduct = async (req, res, next) => {
   }
 };
 
-module.exports = { changeProduct, canAddProduct, changeComment, changeMessage, changeRate };
+module.exports = {
+  changeUserAccount,
+  changeProduct,
+  canAddProduct,
+  changeComment,
+  changeMessage,
+  changeRate,
+};
 
 /// training content by admin with comment
 /// rating the product owner

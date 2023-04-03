@@ -9,6 +9,7 @@ const userRoute = require("./src/routes/userAccount.routes");
 const commentRoute = require("./src/routes/comment.routes");
 const messageRoutes = require("./src/routes/message.routes");
 const ratingRoute = require("./src/routes/rating.route");
+const orderRoute = require("./src/routes/order.routes");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -39,3 +40,4 @@ trainingRoute(app)
 commentRoute(app)
 messageRoutes(app)
 ratingRoute(app)
+orderRoute(app)

@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken");
 const secretKey = require("../../config/secret.config");
-const RegisterModel = require("../../models/auth/register.model");
 const UserModel = require("../../models/auth/signup.model");
 
 const verifyToken = (req, res, next) => {
@@ -22,7 +21,7 @@ const verifyToken = (req, res, next) => {
 
 const isAdmin = async (req, res, next) => {
   try {
-    const user = await RegisterModel.findOne({ _id: req.userId, roles:"admin"});
+    const user = await UserModel.findOne({ _id: req.userId, roles:"admin"});
     if (user) {
       next();
       return;
@@ -39,7 +38,7 @@ const isAdmin = async (req, res, next) => {
 const isAgent = async (req, res, next) => {
   
     try {
-        const user = await RegisterModel.findOne({_id: req.userId, roles:"agent"})
+        const user = await UserModel.findOne({_id: req.userId, roles:"agent"})
         if(user){
             next()
             return

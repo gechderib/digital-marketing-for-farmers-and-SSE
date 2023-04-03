@@ -6,8 +6,8 @@ const productRoute = (app) => {
     const router = require("express").Router();
 
     router.post("/addProduct",[verifyToken, canAddProduct], addProduct)
-    router.get("/product",[verifyToken], getAllProducts)
-    router.get("/product/:id",[verifyToken,],getProduct)
+    router.get("/products",[verifyToken], getAllProducts)
+    router.get("/product/:id",[verifyToken],getProduct)
     router.get("/myProduct/",[verifyToken],getMyProduct)
     router.patch("/product/:id",[verifyToken, changeProduct],updateProduct)
     router.delete("/product/:id",[verifyToken, changeProduct],deleteProduct)

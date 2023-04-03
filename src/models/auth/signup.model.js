@@ -4,28 +4,22 @@ const signupSchema = mongoose.Schema(
   {
     firstName:{type:String, required:true},
     lastName:{type:String, required:true},
-    email: String,
+    email: {type: String},
     phoneNumber: {type:String, required:true, unique:true},
-    password: String,
+    password: {type: String, required:true},
     roles: {type:[String], default:["customer"]},
-    profilePicture:String,
-    sseLicense:{type:String, require: isSse},
-    farmerIdPicture:{type:String, required:isFarmer}
+    profilePicture:{type: String},
+    identifictionPicture:{type:String, required: isSseOrFarmer},
+    verified:{type: Boolean, default:false}
   },
   {
     timestamps: true,
   }
 );
 
-function isFarmer(){
-    if(this.roles.includes("farmer")){
-        return true
-    }
-    return false
-}
 
-function isSse() {
-    if(this.roles.includes("sse")){
+function isSseOrFarmer() {
+    if(this.roles.includes("sse") || this.roles.includes("farmer")){
         return true
     }
     return false
