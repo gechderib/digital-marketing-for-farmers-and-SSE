@@ -18,10 +18,15 @@ const signin = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id }, secretKey, { expiresIn: 86400 });
-
     res.status(201).send({
       id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
       phoneNumber: user.phoneNumber,
+      profilePicture: user.profilePicture,
+      identifictionPicture: user.identifictionPicture,
+      verified:true,
       roles: user.roles,
       accessToken: token,
     });
