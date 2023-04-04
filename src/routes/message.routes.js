@@ -1,12 +1,12 @@
 const { sendMessage, getMessages, getMessage, getYourMessage, getSavedMessage, updateMessage, deleteMessage } = require("../controllers/message.controller");
-const { verifyToken } = require("../middlewares/auth/authJwt");
+const { verifyToken, isAdmin } = require("../middlewares/auth/authJwt");
 const { changeMessage } = require("../middlewares/product/product.middleware");
 
 const messageRoutes = (app) => {
     const router = require("express").Router();
 
     router.post("/message/:id",[verifyToken], sendMessage)
-    router.get("/messages",[verifyToken], getMessages)
+    router.get("/messages",[verifyToken, isAdmin], getMessages)
     router.get("/message/:id",[verifyToken], getMessage)
     router.get("/getYourMessage/:id",[verifyToken], getYourMessage)
     router.get("/getSavedMessages/:id",[verifyToken],getSavedMessage)

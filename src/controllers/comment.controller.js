@@ -1,10 +1,16 @@
 const CommentModel = require("../models/comments.model");
+const TrainingModel = require("../models/training.model");
 
 const addComment = async (req, res) => {
   
   try {
     const {trainingId} = req.params
     const newComment = new CommentModel({...req.body,commentedBy: req.userId, training:trainingId});
+    const training = await TrainingModel.findOne({_id: trainingId})
+    if(!training){
+      res.status(400).send({message: "No training found to comment"});
+      return
+    }
     const response = await newComment.save();
     if (response) {
       res.status(201).send({message: "comment successfully added"});

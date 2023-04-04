@@ -69,7 +69,7 @@ const changeComment = async (req, res, next) => {
     }
     res
       .status(400)
-      .send({ message: "only comment owner and admin can change" });
+      .send({ message: "only comment owner and admin can change or comment should exist" });
     return;
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -117,7 +117,7 @@ const changeRate = async (req, res, next) => {
         next();
         return;
       }
-      res.status(400).send({ message: "you can only change your message" });
+      res.status(400).send({ message: "you can only change your rate" });
       return;
     } else {
       res.status(401).send({ message: "wrong id" });

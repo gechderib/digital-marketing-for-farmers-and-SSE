@@ -1,17 +1,36 @@
 const { ObjectId } = require("mongodb");
 const RatingModel = require("../models/rating.model");
+const UserModel = require("../models/auth/signup.model");
+const ProductModel = require("../models/product.model");
 
 const giveRate = async (req, res) => {
   try {
     const { sellerId } = req.params;
     const { productId } = req.params;
-    const newRate = RatingModel({
-      ...req.body,
-      productOwner: sellerId,
-      ratedBy: req.userId,
-      product: productId,
-    });
     if (ObjectId.isValid(sellerId) && ObjectId.isValid(productId)) {
+      const newRate = RatingModel({
+        ...req.body,
+        productOwner: sellerId,
+        ratedBy: req.userId,
+        product: productId,
+      });
+      const user = await UserModel.findOne({ _id: sellerId });
+      const product = await ProductModel.findOne({ _id: productId });
+      if (!user) {
+        res.status(400).send({ message: "user not found" });
+        return;
+      }
+      if (!product) {
+        res.status(400).send({ message: "product not found" });
+        return;
+      }
+      if (product.postedBy != sellerId) {
+        res
+          .status(400)
+          .send({ message: "the product is not posted by this user" });
+        return;
+      }
+
       const response = await newRate.save();
       if (response) {
         res.status(201).send({ message: "successfully rated the seller" });

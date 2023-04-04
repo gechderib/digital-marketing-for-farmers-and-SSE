@@ -1,6 +1,7 @@
 const { response } = require("express");
 const MessageModel = require("../models/message.model");
 const { ObjectId } = require("mongodb");
+const UserModel = require("../models/auth/signup.model");
 
 const sendMessage = async (req, res) => {
   try {
@@ -11,6 +12,11 @@ const sendMessage = async (req, res) => {
         sender: req.userId,
         reciever: id,
       });
+      const user = await UserModel.findOne({_id: id})
+      if(!user){
+        res.status(400).send({message: "reciever not found"});
+        return;
+      }
       const response = await newMessage.save();
       if (response) {
         res.status(201).send({ message: "message successfully send" });

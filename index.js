@@ -10,6 +10,7 @@ const commentRoute = require("./src/routes/comment.routes");
 const messageRoutes = require("./src/routes/message.routes");
 const ratingRoute = require("./src/routes/rating.route");
 const orderRoute = require("./src/routes/order.routes");
+const apiDescriptionRoute = require("./src/routes");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -32,6 +33,8 @@ mongoose
     console.log(err);
     process.exit();
   });
+
+apiDescriptionRoute(app)
 
 authRoute(app)
 userRoute(app)
