@@ -4,15 +4,11 @@ const UserModel = require("../../models/auth/signup.model");
 const checkDuplicatedPhoneNumberOrEmail = async (req, res, next) => {
   try {
     const user = await UserModel.findOne({ phoneNumber: req.body.phoneNumber });
-    const email = await UserModel.findOne({ email: req.body.email });
     if (user) {
       res.status(409).json({ message: "Phone number already exist" });
       return;
     }
-    if (email) {
-      res.status(409).json({ message: "Email already exist" });
-      return;
-    }
+
     next();
   } catch (err) {
     res.status(500).json({ message: err.message });
