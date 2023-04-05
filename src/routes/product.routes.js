@@ -1,5 +1,5 @@
 const { addProduct, getAllProducts, getProduct, updateProduct, deleteProduct, getMyProduct } = require("../controllers/product/product.controller");
-const { verifyToken, isAdmin, isSse } = require("../middlewares/auth/authJwt");
+const { verifyToken } = require("../middlewares/auth/authJwt");
 const { changeProduct, canAddProduct } = require("../middlewares/product/product.middleware");
 
 const productRoute = (app) => {

@@ -1,4 +1,4 @@
-const { ObjectId } = require("mongodb");
+const OrderModel = require("../../models/order.model");
 const ProductModel = require("../../models/product.model");
 
 const addProduct = async (req, res) => {
@@ -37,22 +37,16 @@ const getAllProducts = async (req, res) => {
 };
 
 const getProduct = async (req, res) => {
-  
   try {
     const { id } = req.params;
-    
-    if (ObjectId.isValid(id)) {
-      const response = await ProductModel.findById(id)
-        .populate("postedBy");
-      if (response) {
-        res.status(200).send(response);
-        return;
-      }
-      res.status(400).send({ message: `product with ${id} not found` });
+
+    const response = await ProductModel.findById(id).populate("postedBy");
+    if (response) {
+      res.status(200).send(response);
       return;
-    } else {
-      res.status(400).send({ message: "wrong id" });
     }
+    res.status(400).send({ message: `product with ${id} not found` });
+    return;
   } catch (err) {
     res.status(500).send({ message: err.message });
     return;
@@ -61,8 +55,9 @@ const getProduct = async (req, res) => {
 
 const getMyProduct = async (req, res) => {
   try {
-    const myProduct = await ProductModel.find({ postedBy: req.userId })
-      .populate("postedBy");
+    const myProduct = await ProductModel.find({
+      postedBy: req.userId,
+    }).populate("postedBy");
     if (myProduct.length > 0) {
       res.status(200).send(myProduct);
       return;
@@ -80,17 +75,14 @@ const getMyProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    if (ObjectId.isValid(id)) {
-      const response = await ProductModel.findByIdAndUpdate(id, req.body);
-      if (response) {
-        res.status(201).send({ message: "product successfully updated" });
-        return;
-      }
-      res.status(400).send({ message: "can't update the data" });
+
+    const response = await ProductModel.findByIdAndUpdate(id, req.body);
+    if (response) {
+      res.status(201).send({ message: "product successfully updated" });
       return;
-    } else {
-      res.status(400).send({ message: "wrong product id" });
     }
+    res.status(400).send({ message: "can't update the data" });
+    return;
   } catch (err) {
     res.status(500).send({ message: err.message });
     return;
@@ -100,18 +92,15 @@ const updateProduct = async (req, res) => {
 const deleteProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    if (ObjectId.isValid(id)) {
-      const response = await ProductModel.deleteOne({ _id: id });
-      if (response) {
-        res.status(200).send({ message: "product successfully deleted" });
-        return;
-      }
-      res.status(400).send({ message: `can't delete product with id ${id}` });
-      return;
-    } else {
-      res.status(400).send({ message: "Wrong product id" });
+
+    const response = await ProductModel.deleteOne({ _id: id });
+    const order = await OrderModel.deleteMany({product: id})
+    if (response && order) {
+      res.status(200).send({ message: "product and their respective orders are successfully deleted" });
       return;
     }
+    res.status(400).send({ message: `can't delete product with id ${id}` });
+    return;
   } catch (err) {
     res.status(500).send({ message: err.message });
     return;

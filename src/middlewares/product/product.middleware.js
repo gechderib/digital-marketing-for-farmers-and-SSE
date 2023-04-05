@@ -1,9 +1,9 @@
-const { ObjectId } = require("mongodb");
 const UserModel = require("../../models/auth/signup.model");
 const CommentModel = require("../../models/comments.model");
 const MessageModel = require("../../models/message.model");
 const ProductModel = require("../../models/product.model");
 const RatingModel = require("../../models/rating.model");
+const OrderModel = require("../../models/order.model");
 
 const changeUserAccount = async (req, res, next) => {
   try {
@@ -80,7 +80,7 @@ const changeComment = async (req, res, next) => {
 const changeMessage = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (ObjectId.isValid(id)) {
+
       const response = await MessageModel.findOne({
         _id: id,
         sender: req.userId,
@@ -91,10 +91,6 @@ const changeMessage = async (req, res, next) => {
       }
       res.status(400).send({ message: "you can only change your message" });
       return;
-    } else {
-      res.status(401).send({ message: "wrong id" });
-      return;
-    }
   } catch (err) {
     res.status(500).send({ message: err.message });
     return;
@@ -104,7 +100,7 @@ const changeMessage = async (req, res, next) => {
 const changeRate = async (req, res, next) => {
   try {
     const { id } = req.params;
-    if (ObjectId.isValid(id)) {
+
       const response = await RatingModel.findOne({
         _id: id,
         ratedBy: req.userId,
@@ -119,15 +115,31 @@ const changeRate = async (req, res, next) => {
       }
       res.status(400).send({ message: "you can only change your rate" });
       return;
-    } else {
-      res.status(401).send({ message: "wrong id" });
-      return;
-    }
+
   } catch (err) {
     res.status(500).send({ message: err.message });
     return;
   }
 };
+
+
+const changeOrder = async (req, res, next) => {
+  try{
+    const {id} = req.params
+    const order = await OrderModel.findOne({orderBy: req.userId, _id:id})
+    const adminUser = await UserModel.findOne({_id: req.userId,roles: "admin"})
+    
+    if(order || adminUser){
+      next();
+      return
+    }
+    res.status(400).send({message: "only order owner and admin can change"});
+    return
+  }catch(err){
+    res.status(500).send({message: err.message});
+    return;
+  }
+}
 
 const canAddProduct = async (req, res, next) => {
   try {
@@ -135,7 +147,6 @@ const canAddProduct = async (req, res, next) => {
       _id: req.userId,
       roles: "customer",
     });
-    console.log(user);
     if (user) {
       res.status(400).send({ message: "customer can't add a product" });
       return;
@@ -155,6 +166,7 @@ module.exports = {
   changeComment,
   changeMessage,
   changeRate,
+  changeOrder
 };
 
 /// training content by admin with comment

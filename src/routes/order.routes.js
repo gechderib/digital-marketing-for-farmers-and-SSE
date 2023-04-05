@@ -1,13 +1,27 @@
-const { addOrder } = require("../controllers/order.controller");
-const { verifyToken } = require("../middlewares/auth/authJwt");
+const {
+  addOrder,
+  getOrders,
+  getOrder,
+  getMyOrders,
+  myOffer,
+  deleteOrder,
+  updateOrder,
+} = require("../controllers/order.controller");
+const { verifyToken, isAdmin } = require("../middlewares/auth/authJwt");
+const { changeOrder } = require("../middlewares/product/product.middleware");
 
 const orderRoute = (app) => {
-    const router = require("express").Router();
+  const router = require("express").Router();
 
-    router.post("/order/:productId",[verifyToken], addOrder);
+  router.post("/order/:productId", [verifyToken], addOrder);
+  router.get("/orders", [verifyToken, isAdmin], getOrders);
+  router.get("/order/:id", [verifyToken], getOrder);
+  router.get("/myOrders", [verifyToken], getMyOrders);
+  router.get("/myOffers", [verifyToken], myOffer);
+  router.delete("/order/:id", [verifyToken, changeOrder], deleteOrder);
+  router.patch("/order/:id", [verifyToken, changeOrder], updateOrder);
 
+  app.use("/api/dmfsse", router);
+};
 
-    app.use("/api/dmfsse", router)
-}
-
-module.exports = orderRoute
+module.exports = orderRoute;

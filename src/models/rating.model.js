@@ -1,7 +1,9 @@
 const { default: mongoose } = require("mongoose");
+const { v4: uuidv4 } = require('uuid');
 
 const ratingSchema = mongoose.Schema(
   {
+    // _id: { type: String, default: uuidv4().replace(/\-/g, "") },
     productOwner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

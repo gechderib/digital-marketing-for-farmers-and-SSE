@@ -1,7 +1,9 @@
 const { default: mongoose } = require("mongoose");
+const { v4: uuidv4 } = require('uuid');
 
 const orderSchema = mongoose.Schema(
   {
+    // _id: { type: String, default: uuidv4().replace(/\-/g, "") },
     orderBy: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
@@ -20,7 +22,6 @@ const orderSchema = mongoose.Schema(
   }
 );
 
-
 const OrderModel = mongoose.model("Order", orderSchema);
 
-module.exports = OrderModel
+module.exports = OrderModel;
