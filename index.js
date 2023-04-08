@@ -18,6 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 mongoose
   .connect(dbConfig.urlAtlas, {
     useNewUrlParser: true,

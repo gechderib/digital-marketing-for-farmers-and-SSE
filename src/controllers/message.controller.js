@@ -110,6 +110,23 @@ const getSavedMessage = async (req, res) => {
   }
 };
 
+const connectedUserList = async (req, res) => {
+  try {
+    const messages = await MessageModel.find({
+      $or: [{ sender: req.userId }, { reciever: req.userId }],
+    });
+    if (messages) {
+      res.status(200).send(messages);
+      return;
+    }
+    res.status(400).send({ messages: "message not found" });
+    return;
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+    return;
+  }
+};
+
 const updateMessage = async (req, res) => {
   try {
     const { id } = req.params;
@@ -150,4 +167,5 @@ module.exports = {
   getSavedMessage,
   updateMessage,
   deleteMessage,
+  connectedUserList,
 };

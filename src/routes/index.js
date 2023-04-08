@@ -59,8 +59,10 @@ const apiDescriptionController = async (req, res) => {
         <li><a style="color:blue; font-size:25px"href="#">/api/dmfsse/getSavedMessages/id</a> <span style="font-size:20; color:green;">get saved message that you chat with yourself the id is your id</span></li>
         <li><a style="color:blue; font-size:25px"href="#">/api/dmfsse/message/id</a> <span style="font-size:20; color:green;">delete message if you are the owner or admin</span></li>
         <li><a style="color:blue; font-size:25px"href="#">/api/dmfsse/message/:id</a> <span style="font-size:20; color:green;">update message if you are the owner or admin</span></li>
+        <li><a style="color:blue; font-size:25px"href="#">/api/dmfsse/connectedUserList</a> <span style="font-size:20; color:green;">get a list of user you talked</span></li>
 
         </ul>
+        
 
         <h3 style="color:green;">Rating</h3>
 
@@ -86,7 +88,7 @@ const apiDescriptionController = async (req, res) => {
         </ul>
 
         <h3 style="color:green;">Payment</h3>
-        <ul>
+        <ul> 
          <li><a style="color:blue; font-size:25px "href="#">/api/dmfsse/<a> <span style="font-size:20; color:green;"></span></li>
 
         </ul>
