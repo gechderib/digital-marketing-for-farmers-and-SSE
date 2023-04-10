@@ -11,6 +11,7 @@ const messageRoutes = require("./src/routes/message.routes");
 const ratingRoute = require("./src/routes/rating.route");
 const orderRoute = require("./src/routes/order.routes");
 const apiDescriptionRoute = require("./src/routes");
+const paymentRoute = require("./src/routes/payment.route");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -20,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 mongoose
-  .connect(dbConfig.urlAtlas, {
+  .connect(dbConfig.url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -45,3 +46,4 @@ commentRoute(app)
 messageRoutes(app)
 ratingRoute(app)
 orderRoute(app)
+paymentRoute(app)

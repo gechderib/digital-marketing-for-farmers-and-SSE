@@ -1,9 +1,9 @@
+const { ObjectId } = require("mongodb");
 const { mongoose } = require("mongoose");
 const { v4: uuidv4 } = require('uuid');
 
 const signupSchema = mongoose.Schema(
   {
-    // _id: { type: String, default:  uuidv4().replace(/\-/g, "") },
     firstName:{type:String, required:true},
     lastName:{type:String, required:true},
     email: {type: String, default: "example@gmail.com"},

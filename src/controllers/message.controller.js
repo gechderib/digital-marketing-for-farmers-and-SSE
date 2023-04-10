@@ -1,6 +1,7 @@
 const { response } = require("express");
 const MessageModel = require("../models/message.model");
 const UserModel = require("../models/auth/signup.model");
+const { ObjectId } = require("mongodb");
 
 const sendMessage = async (req, res) => {
   try {
@@ -111,21 +112,132 @@ const getSavedMessage = async (req, res) => {
 };
 
 const connectedUserList = async (req, res) => {
+  const page = req.query.p || 0;
+  const userPerScroll = 10;
   try {
     const messages = await MessageModel.find({
-      $or: [{ sender: req.userId }, { reciever: req.userId }],
+      $or: [
+        { sender: new ObjectId(req.userId) },
+        { reciever: new ObjectId(req.userId) },
+      ],
     });
-    if (messages) {
-      res.status(200).send(messages);
+    const userIds = [];
+    for (let i = 0; i < messages.length; i++) {
+      if (!userIds.includes(messages[i].sender._id)) {
+        userIds.push(messages[i].sender._id);
+      }
+      if (!userIds.includes(messages[i].reciever._id)) {
+        userIds.push(messages[i].reciever._id);
+      }
+    }
+    const connectedUsers = await UserModel.find(
+      { _id: { $in: userIds } },
+      {
+        password: 0,
+        email: 0,
+        phoneNumber: 0,
+        identifictionPicture: 0,
+        roles: 0,
+        verified: 0,
+      }
+    )
+      .skip(page * userPerScroll)
+      .limit(userPerScroll);
+
+    if (messages && connectedUsers) {
+      res.status(200).send(connectedUsers);
       return;
     }
-    res.status(400).send({ messages: "message not found" });
-    return;
   } catch (err) {
     res.status(500).send({ message: err.message });
     return;
   }
 };
+
+// const connectedUserLists = async (req, res) => {
+//   try {
+//     let page = parseInt(req.query.page) || 0;
+//     let limit = parseInt(req.query.limit) || 10;
+
+//     const messages = await MessageModel.aggregate([
+//       {
+//         $match: {
+//           $or: [
+//             { sender: new ObjectId(req.userId) },
+//             { reciever: new ObjectId(req.userId) },
+//           ],
+//         },
+//       },
+
+//       {
+//         $lookup: {
+//           from: "users",
+//           foreignField: "_id",
+//           localField: "sender",
+//           as: "sender",
+//         },
+//       },
+//       { $unwind: "$sender" },
+//       {
+//         $lookup: {
+//           from: "users",
+//           foreignField: "_id",
+//           localField: "reciever",
+//           as: "reciever",
+//         },
+//       },
+//       { $unwind: "$reciever" },
+
+//       {
+//         $group: {
+//           _id: "$_id",
+//           message: { $last: "$message" },
+//           sender: {
+//             $last: {
+//               _id: "$sender._id",
+//               firstName: "$sender.firstName",
+//               lastName: "$sender.lastName",
+//               profilePicture: "$sender.profilePicture",
+//             },
+//           },
+//           reciever: {
+//             $last: {
+//               _id: "$reciever._id",
+//               firstName: "$reciever.firstName",
+//               lastName: "$reciever.lastName",
+//               profilePicture: "$reciever.profilePicture",
+//             },
+//           },
+//         },
+//       },
+//       // applay pagination
+//       { $skip: page * limit },
+//       { $limit: limit },
+//     ]);
+//     let mm = [];
+//     for (let i = 0; i < messages.length; i++) {
+//       if (!mm.includes(messages[i].sender._id.toString())) {
+//         mm.push(messages[i].sender._id.toString());
+//       }
+//       if (!mm.includes(messages[i].reciever._id.toString())) {
+//         mm.push(messages[i].reciever._id.toString());
+//       }
+//     }
+
+//     const user = await UserModel.find({ _id: { $in: mm } });
+//     console.log(user);
+//     console.log(mm);
+//     if (messages) {
+//       res.status(200).send(messages);
+//       return;
+//     }
+//     res.status(400).send({ messages: "message not found" });
+//     return;
+//   } catch (err) {
+//     res.status(500).send({ message: err.message });
+//     return;
+//   }
+// };
 
 const updateMessage = async (req, res) => {
   try {
