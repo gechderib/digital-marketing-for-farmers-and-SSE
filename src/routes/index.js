@@ -89,7 +89,8 @@ const apiDescriptionController = async (req, res) => {
 
         <h3 style="color:green;">Payment</h3>
         <ul> 
-         <li><a style="color:blue; font-size:25px "href="#">/api/dmfsse/<a> <span style="font-size:20; color:green;"></span></li>
+        <li><a style="color:blue; font-size:25px "href="#">/api/dmfsse/stripeCheckout<a> <span style="font-size:20; color:green;">check out using strip checkout payment session the UI is from stripe which redirect to strip payment session</span></li>
+        <li><a style="color:blue; font-size:25px "href="#">/api/dmfsse/stripPaymentIntent<a> <span style="font-size:20; color:green;">pay using stripe using payment intent, the UI is from our site and can be custemized</span></li>
 
         </ul>
         </div>
