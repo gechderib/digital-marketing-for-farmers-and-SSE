@@ -17,6 +17,11 @@ const sendMessage = async (req, res) => {
       res.status(400).send({ message: "reciever not found" });
       return;
     }
+    const sender = await UserModel.findOne({ _id: req.userId });
+    if (!sender) {
+      res.status(400).send({ message: "sender not found" });
+      return;
+    }
     const response = await newMessage.save();
     if (response) {
       res.status(201).send({ message: "message successfully send" });
@@ -32,10 +37,51 @@ const sendMessage = async (req, res) => {
 
 const getMessages = async (req, res) => {
   try {
-    const messages = await MessageModel.find({})
-      .populate("sender")
-      .populate("reciever");
-    if (response) {
+    const messages = await MessageModel.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "sender",
+          as: "sender",
+        },
+      },
+      { $unwind: "$sender" },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "reciever",
+          as: "reciever",
+        },
+      },
+      { $unwind: "$reciever" },
+      { $unwind: "$sender.roles" },
+      { $unwind: "$reciever.roles" },
+      {
+        $group: {
+          _id: "$_id",
+          message: { $last: "$message" },
+          sender: {
+            $last: {
+              _id: "$sender._id",
+              firstName: "$sender.firstName",
+              lastName: "$sender.lastName",
+              roles: "$sender.roles",
+            },
+          },
+          reciever: {
+            $last: {
+              _id: "$reciever._id",
+              firstName: "$reciever.firstName",
+              lastName: "$reciever.lastName",
+              roles: "$reciever.roles",
+            },
+          },
+        },
+      },
+    ]);
+    if (messages) {
       res.status(200).send(messages);
       return;
     }
@@ -50,6 +96,7 @@ const getMessages = async (req, res) => {
 const getMessage = async (req, res) => {
   try {
     const { id } = req.params;
+
     const message = await MessageModel.findById(id);
     if (response) {
       res.status(200).send(message);
@@ -69,13 +116,69 @@ const getMessage = async (req, res) => {
 const getYourMessage = async (req, res) => {
   try {
     const { id } = req.params;
+    const messages = await MessageModel.aggregate([
+      {
+        $match: {
+          $and: [
+            {
+              $or: [
+                { sender: new ObjectId(req.userId) },
+                { reciever: new ObjectId(req.userId) },
+              ],
+            },
+            {
+              $or: [
+                { sender: new ObjectId(id) },
+                { reciever: new ObjectId(id) },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "sender",
+          as: "sender",
+        },
+      },
+      { $unwind: "$sender" },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "reciever",
+          as: "reciever",
+        },
+      },
+      { $unwind: "$reciever" },
+      { $unwind: "$sender.roles" },
+      { $unwind: "$reciever.roles" },
+      {
+        $group: {
+          _id: "$_id",
+          message: { $last: "$message" },
+          sender: {
+            $last: {
+              _id: "$sender._id",
+              firstName: "$sender.firstName",
+              lastName: "$sender.lastName",
+              roles: "$sender.roles",
+            },
+          },
+          reciever: {
+            $last: {
+              _id: "$reciever._id",
+              firstName: "$reciever.firstName",
+              lastName: "$reciever.lastName",
+              roles: "$reciever.roles",
+            },
+          },
+        },
+      },
+    ]);
 
-    const messages = await MessageModel.find({
-      $and: [
-        { $or: [{ sender: req.userId }, { reciever: req.userId }] },
-        { $or: [{ sender: id }, { reciever: id }] },
-      ],
-    });
     if (messages) {
       res.status(200).send(messages);
       return;
@@ -91,16 +194,63 @@ const getYourMessage = async (req, res) => {
 const getSavedMessage = async (req, res) => {
   try {
     const { id } = req.params;
-    const savedMessage = await MessageModel.find({
-      $and: [
-        { $or: [{ sender: req.userId }, { reciever: req.userId }] },
-        { $or: [{ sender: id }, { reciever: id }] },
-        { sender: { $eq: req.userId } },
-        { reciever: { $eq: req.userId } },
-      ],
-    });
-    if (savedMessage) {
-      res.status(200).send(savedMessage);
+    const savedMessages = await MessageModel.aggregate([
+      {
+        $match: {
+          $and: [
+            { $or: [{ sender: new ObjectId(req.userId) }, { reciever: new ObjectId(req.userId) }] },
+            { $or: [{ sender: new ObjectId(id) }, { reciever: new ObjectId(id) }] },
+            { sender: { $eq: new ObjectId(req.userId) } },
+            { reciever: { $eq: new ObjectId(req.userId) } },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "sender",
+          as: "sender",
+        },
+      },
+      { $unwind: "$sender" },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "reciever",
+          as: "reciever",
+        },
+      },
+      { $unwind: "$reciever" },
+      { $unwind: "$sender.roles" },
+      { $unwind: "$reciever.roles" },
+      {
+        $group: {
+          _id: "$_id",
+          message: { $last: "$message" },
+          sender: {
+            $last: {
+              _id: "$sender._id",
+              firstName: "$sender.firstName",
+              lastName: "$sender.lastName",
+              roles: "$sender.roles",
+            },
+          },
+          reciever: {
+            $last: {
+              _id: "$reciever._id",
+              firstName: "$reciever.firstName",
+              lastName: "$reciever.lastName",
+              roles: "$reciever.roles",
+            },
+          },
+        },
+      },
+    ]);
+
+    if (savedMessages) {
+      res.status(200).send(savedMessages);
       return;
     }
     res.status(400).send({ message: "message not found" });
@@ -152,7 +302,7 @@ const connectedUserList = async (req, res) => {
     res.status(500).send({ message: err.message });
     return;
   }
-};
+};                                                                                                                                      
 
 // const connectedUserLists = async (req, res) => {
 //   try {

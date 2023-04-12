@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const OrderModel = require("../../models/order.model");
 const ProductModel = require("../../models/product.model");
 
@@ -20,12 +21,40 @@ const getAllProducts = async (req, res) => {
   const page = req.query.p || 0;
   const productsPerPage = 5;
   try {
-    const response = await ProductModel.find({})
-      .populate("postedBy")
-      .skip(page * productsPerPage)
-      .limit(productsPerPage);
-    if (response) {
-      res.status(200).send(response.reverse());
+    const product = await ProductModel.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "postedBy",
+          as: "postedBy",
+        },
+      },
+      { $unwind: "$postedBy" },
+      { $unwind: "$postedBy.roles" },
+      {
+        $group: {
+          _id: "$_id",
+          name: { $last: "$name" },
+          description: { $last: "$description" },
+          price: { $last: "$price" },
+          amount: { $last: "$amount" },
+          soldout: { $last: "$soldout" },
+          postedBy: {
+            $last: {
+              _id: "$postedBy._id",
+              firstName: "$postedBy.firstName",
+              lastName: "$postedBy.lastName",
+              roles: "$postedBy.roles",
+            },
+          },
+        },
+      },
+      { $skip: page * productsPerPage },
+      { $limit: productsPerPage },
+    ]);
+    if (product) {
+      res.status(200).send(product);
       return;
     }
     res.status(400).send({ message: "products not found" });
@@ -40,9 +69,39 @@ const getProduct = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const response = await ProductModel.findById(id).populate("postedBy");
-    if (response) {
-      res.status(200).send(response);
+    const product = await ProductModel.aggregate([
+      {$match: {_id: new ObjectId(id)}},
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "postedBy",
+          as: "postedBy",
+        },
+      },
+      { $unwind: "$postedBy" },
+      { $unwind: "$postedBy.roles" },
+      {
+        $group: {
+          _id: "$_id",
+          name: { $last: "$name" },
+          description: { $last: "$description" },
+          price: { $last: "$price" },
+          amount: { $last: "$amount" },
+          soldout: { $last: "$soldout" },
+          postedBy: {
+            $last: {
+              _id: "$postedBy._id",
+              firstName: "$postedBy.firstName",
+              lastName: "$postedBy.lastName",
+              roles: "$postedBy.roles",
+            },
+          },
+        },
+      },
+    ]); 
+    if (product) {
+      res.status(200).send(product[0]);
       return;
     }
     res.status(400).send({ message: `product with ${id} not found` });
@@ -55,11 +114,40 @@ const getProduct = async (req, res) => {
 
 const getMyProduct = async (req, res) => {
   try {
-    const myProduct = await ProductModel.find({
-      postedBy: req.userId,
-    }).populate("postedBy");
-    if (myProduct.length > 0) {
-      res.status(200).send(myProduct);
+    const product = await ProductModel.aggregate([
+      {$match: {postedBy: new ObjectId(req.userId)}},
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "postedBy",
+          as: "postedBy",
+        },
+      },
+      { $unwind: "$postedBy" },
+      { $unwind: "$postedBy.roles" },
+      {
+        $group: {
+          _id: "$_id",
+          name: { $last: "$name" },
+          description: { $last: "$description" },
+          price: { $last: "$price" },
+          amount: { $last: "$amount" },
+          soldout: { $last: "$soldout" },
+          postedBy: {
+            $last: {
+              _id: "$postedBy._id",
+              firstName: "$postedBy.firstName",
+              lastName: "$postedBy.lastName",
+              roles: "$postedBy.roles",
+            },
+          },
+        },
+      },
+    ]); 
+
+    if (product) {
+      res.status(200).send(product);
       return;
     }
     res.status(400).send({ message: "product is not found" });
@@ -94,9 +182,11 @@ const deleteProduct = async (req, res) => {
     const { id } = req.params;
 
     const response = await ProductModel.deleteOne({ _id: id });
-    const order = await OrderModel.deleteMany({product: id})
+    const order = await OrderModel.deleteMany({ product: id });
     if (response && order) {
-      res.status(200).send({ message: "product and their respective orders are successfully deleted" });
+      res.status(200).send({
+        message: "product and their respective orders are successfully deleted",
+      });
       return;
     }
     res.status(400).send({ message: `can't delete product with id ${id}` });

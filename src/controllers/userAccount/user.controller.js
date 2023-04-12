@@ -20,7 +20,7 @@ const getUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await UserModel.find({});
+    const users = await UserModel.find({},{password:0});
     if (users) {
       res.status(200).send(users);
       return;
@@ -34,7 +34,7 @@ const getAllUsers = async (req, res) => {
 
 const getAllFarmers = async (req, res) => {
   try {
-    const users = await UserModel.find({ roles: "farmer" });
+    const users = await UserModel.find({ roles: "farmer" },{password: 0});
     if (users) {
       res.status(200).send(users);
       return;
@@ -54,7 +54,6 @@ const updateUser = async (req, res) => {
   const { id } = req.params;
   try {
     const response = await UserModel.findByIdAndUpdate(id, req.body, {});
-    console.log("wowo");
     if (!response) {
       res.status(400).send({ message: `can't update with id ${id}` });
       return;

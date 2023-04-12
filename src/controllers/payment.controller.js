@@ -1,5 +1,3 @@
-const UserModel = require("../models/auth/signup.model");
-
 var Publishable_Key =
   "pk_test_51MtmwdGQR0aBgND8uXLJHMhxpVlTszUAJdAiYryN60bjlNg82XvqdegicaJaKbZ9RyR9qQzE2VpBdaFkh2idvS2900GRzXKnRN";
 var Secret_Key =

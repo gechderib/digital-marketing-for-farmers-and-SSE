@@ -69,7 +69,10 @@ const changeComment = async (req, res, next) => {
     }
     res
       .status(400)
-      .send({ message: "only comment owner and admin can change or comment should exist" });
+      .send({
+        message:
+          "only comment owner and admin can change or comment should exist",
+      });
     return;
   } catch (err) {
     res.status(500).send({ message: err.message });
@@ -81,16 +84,16 @@ const changeMessage = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-      const response = await MessageModel.findOne({
-        _id: id,
-        sender: req.userId,
-      });
-      if (response) {
-        next();
-        return;
-      }
-      res.status(400).send({ message: "you can only change your message" });
+    const response = await MessageModel.findOne({
+      _id: id,
+      sender: req.userId,
+    });
+    if (response) {
+      next();
       return;
+    }
+    res.status(400).send({ message: "you can only change your message" });
+    return;
   } catch (err) {
     res.status(500).send({ message: err.message });
     return;
@@ -101,45 +104,54 @@ const changeRate = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-      const response = await RatingModel.findOne({
-        _id: id,
-        ratedBy: req.userId,
-      });
-      const adminUser = await UserModel.findOne({
-        _id: req.userId,
-        roles: "admin",
-      });
-      if (response || adminUser) {
-        next();
-        return;
-      }
-      res.status(400).send({ message: "you can only change your rate" });
+    const response = await RatingModel.findOne({
+      _id: id,
+      ratedBy: req.userId,
+    });
+    const adminUser = await UserModel.findOne({
+      _id: req.userId,
+      roles: "admin",
+    });
+    if (response || adminUser) {
+      next();
       return;
-
+    }
+    res.status(400).send({ message: "you can only change your rate" });
+    return;
   } catch (err) {
     res.status(500).send({ message: err.message });
     return;
   }
 };
 
-
 const changeOrder = async (req, res, next) => {
-  try{
-    const {id} = req.params
-    const order = await OrderModel.findOne({orderBy: req.userId, _id:id})
-    const adminUser = await UserModel.findOne({_id: req.userId,roles: "admin"})
-    
-    if(order || adminUser){
-      next();
+  try {
+    const { id } = req.params;
+    const order = await OrderModel.findOne({_id: id });
+    if(!order){
+      res.status(400).send({message: "you have to be order owner or offer owner or admin to change data"});
       return
     }
-    res.status(400).send({message: "only order owner and admin can change"});
-    return
-  }catch(err){
-    res.status(500).send({message: err.message});
+    const productId = order.product;
+    const product = await ProductModel.findById(productId).populate("postedBy");
+    const postedBy = await UserModel.findById(product.postedBy._id)
+
+    const adminUser = await UserModel.findOne({
+      _id: req.userId,
+      roles: "admin",
+    });
+
+    if (order.orderBy == req.userId || adminUser || postedBy) {
+      next();
+      return;
+    }
+    res.status(400).send({ message: "only order owner and admin can change" });
+    return;
+  } catch (err) {
+    res.status(500).send({ message: err.message });
     return;
   }
-}
+};
 
 const canAddProduct = async (req, res, next) => {
   try {
@@ -159,6 +171,38 @@ const canAddProduct = async (req, res, next) => {
   }
 };
 
+const canRate = async (req, res, next) => {
+  const { productId } = req.params;
+  try {
+    const user = await UserModel.findById(req.userId);
+    const product = await ProductModel.findById(productId);
+    if(!user || !product){
+      res.status(400).send({message: "product id or user doesn't exist"});
+      return;
+    }
+    const order = await OrderModel.findOne({
+      orderBy: req.userId,
+      product: productId,
+      accepted: true,
+      canRate: true,
+    });
+    if (!order) {
+      res
+        .status(400)
+        .send({
+          message:
+            "your order is not accepted or you didn't complet the payment",
+        });
+      return;
+    }
+    next();
+    return;
+  } catch (err) {
+    res.status(500).send({ message: err.message });
+    return;
+  }
+};
+
 module.exports = {
   changeUserAccount,
   changeProduct,
@@ -166,7 +210,8 @@ module.exports = {
   changeComment,
   changeMessage,
   changeRate,
-  changeOrder
+  changeOrder,
+  canRate
 };
 
 /// training content by admin with comment

@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const CommentModel = require("../models/comments.model");
 const TrainingModel = require("../models/training.model");
 
@@ -24,12 +25,41 @@ const getTrainings = async (req, res) => {
   try {
     const page = req.query.p || 0;
     const trainingPerPage = 5;
-    const response = await TrainingModel.find({})
-      .populate("postedBy")
-      .skip(page * trainingPerPage)
-      .limit(trainingPerPage);
-    if (response) {
-      res.status(200).send(response);
+    const trainings = await TrainingModel.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "postedBy",
+          as: "postedBy",
+        },
+      },
+      { $unwind: "$postedBy" },
+
+      { $unwind: "$postedBy.roles" },
+
+      {
+        $group: {
+          _id: "$_id",
+          title: { $last: "$title" },
+          description: { $last: "$description" },
+          mediaFile: { $last: "$mediaFile" },
+          postedBy: {
+            $last: {
+              _id: "$postedBy._id",
+              firstName: "$postedBy.firstName",
+              lastName: "$postedBy.lastName",
+              roles: "$postedBy.roles",
+            },
+          },
+        },
+      },
+      { $skip: page * trainingPerPage },
+      { $limit: trainingPerPage },
+    ]);
+
+    if (trainings) {
+      res.status(200).send(trainings);
       return;
     }
     res.status(400).send({ message: "can't add the data" });
@@ -43,9 +73,39 @@ const getTrainings = async (req, res) => {
 const getTraining = async (req, res) => {
   try {
     const { id } = req.params;
-    const response = await TrainingModel.findById(id).populate("postedBy");
-    if (response) {
-      res.status(200).send(response);
+    const training = await TrainingModel.aggregate([
+      {$match: {_id: new ObjectId(id)}},
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "postedBy",
+          as: "postedBy",
+        },
+      },
+      { $unwind: "$postedBy" },
+
+      { $unwind: "$postedBy.roles" },
+
+      {
+        $group: {
+          _id: "$_id",
+          title: { $last: "$title" },
+          description: {$last: "$description"},
+          mediaFile: {$last: "$mediaFile"},
+          postedBy: {
+            $last: {
+              _id: "$postedBy._id",
+              firstName: "$postedBy.firstName",
+              lastName: "$postedBy.lastName",
+              roles: "$postedBy.roles",
+            },
+          },
+        },
+      },
+    ]);
+    if (training) {
+      res.status(200).send(training);
       return;
     }
     res.status(400).send({ message: "data not found" });

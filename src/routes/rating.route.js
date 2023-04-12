@@ -1,11 +1,11 @@
 const { giveRate, getYourRate, updateRate, deleteRating, getProductOwnerPreviousRate } = require("../controllers/rating.controller");
 const { verifyToken } = require("../middlewares/auth/authJwt");
-const { changeRate } = require("../middlewares/product/product.middleware");
+const { changeRate, canRate } = require("../middlewares/product/product.middleware");
 
 const ratingRoute = (app) => {
     const router = require("express").Router();
 
-    router.post("/rate/:sellerId/:productId",[verifyToken],giveRate);
+    router.post("/rate/:sellerId/:productId",[verifyToken, canRate],giveRate);
     router.get("/rate/:productOwnerId",[verifyToken], getYourRate);
     router.get("/productOwnerPreviousRate/:sellerId",[verifyToken], getProductOwnerPreviousRate)
     router.patch("/rate/:id",[verifyToken, changeRate], updateRate);

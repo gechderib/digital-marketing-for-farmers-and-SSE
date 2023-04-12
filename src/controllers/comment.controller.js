@@ -1,3 +1,4 @@
+const { ObjectId } = require("mongodb");
 const CommentModel = require("../models/comments.model");
 const TrainingModel = require("../models/training.model");
 
@@ -27,9 +28,37 @@ const addComment = async (req, res) => {
 
 const getComments = async (req, res) => {
   try {
-    const comments = await CommentModel.find({})
-      .populate("commentedBy")
-      .populate("training");
+    const comments = await CommentModel.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "commentedBy",
+          as: "commentedBy",
+        },
+      },
+      { $unwind: "$commentedBy" },
+
+      { $unwind: "$commentedBy.roles" },
+
+      {
+        $group: {
+          _id: "$_id",
+          training: { $last: "$training" },
+          comment: {$last: "$comment"},
+          commentedBy: {
+            $last: {
+              _id: "$commentedBy._id",
+              firstName: "$commentedBy.firstName",
+              lastName: "$commentedBy.lastName",
+              roles: "$commentedBy.roles",
+            },
+          },
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last:"$updatedAt"}
+        },
+      },
+    ]);
     if (comments) {
       res.status(200).send(comments);
       return;
@@ -61,11 +90,41 @@ const getComment = async (req, res) => {
 const getSingleTrainingComments = async (req, res) => {
   try {
     const { trainingId } = req.params;
-    const response = await CommentModel.find({ training: trainingId })
-      .populate("commentedBy")
+    const comments = await CommentModel.aggregate([
+      {$match:{training: new ObjectId(trainingId)}},
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "commentedBy",
+          as: "commentedBy",
+        },
+      },
+      { $unwind: "$commentedBy" },
+
+      { $unwind: "$commentedBy.roles" },
+
+      {
+        $group: {
+          _id: "$_id",
+          training: { $last: "$training" },
+          comment: {$last: "$comment"},
+          commentedBy: {
+            $last: {
+              _id: "$commentedBy._id",
+              firstName: "$commentedBy.firstName",
+              lastName: "$commentedBy.lastName",
+              roles: "$commentedBy.roles",
+            },
+          },
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last:"$updatedAt"}
+        },
+      },
+    ]);
       
-    if (response) {
-      res.status(200).send(response);
+    if (comments) {
+      res.status(200).send(comments);
       return;
     }
     res.status(400).send({ message: "no comment found" });
