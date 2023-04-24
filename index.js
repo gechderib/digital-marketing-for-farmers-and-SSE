@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors())
 
 mongoose
-  .connect(dbConfig.url, {
+  .connect(dbConfig.urlAtlas, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
