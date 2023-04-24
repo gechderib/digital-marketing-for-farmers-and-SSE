@@ -1,5 +1,6 @@
 const express = require("express");
 const { mongoose } = require("mongoose");
+const cors = require("cors")
 
 const dbConfig = require("./src/config/db.config");
 const authRoute = require("./src/routes/auth.routes");
@@ -18,10 +19,10 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+app.use(cors())
 
 mongoose
-  .connect(dbConfig.urlAtlas, {
+  .connect(dbConfig.url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

@@ -1,6 +1,4 @@
-const { ObjectId } = require("mongodb");
 const { mongoose } = require("mongoose");
-const { v4: uuidv4 } = require('uuid');
 
 const signupSchema = mongoose.Schema(
   {
