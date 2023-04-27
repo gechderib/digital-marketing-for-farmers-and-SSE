@@ -40,12 +40,14 @@ const getAllProducts = async (req, res) => {
           price: { $last: "$price" },
           amount: { $last: "$amount" },
           soldout: { $last: "$soldout" },
+          photo: {$last:"$photo"},
           postedBy: {
             $last: {
               _id: "$postedBy._id",
               firstName: "$postedBy.firstName",
               lastName: "$postedBy.lastName",
               roles: "$postedBy.roles",
+              profilePicture:"$postedBy.profilePicture"
             },
           },
         },
