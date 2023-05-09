@@ -1,16 +1,23 @@
 const { default: mongoose } = require("mongoose");
-const { v4: uuidv4 } = require('uuid');
 
-const trainingSchema = mongoose.Schema({
+const trainingSchema = mongoose.Schema(
+  {
     // _id: { type: String, default: uuidv4().replace(/\-/g, "") },
-    title:{type: String, required: true},
-    description: {type: String, required:true},
-    mediaFile: {type: String, required: true},
-    postedBy: {type: mongoose.Schema.Types.ObjectId, ref:"User", required: true}
-},{
-    timestaps:true
-})
+    title: { type: String, required: false },
+    description: { type: String, required: false },
+    mediaFile: { type: String, required: false },
+    postedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+  },
+  {
+    
+    timestamps: true,
+  }
+);
 
-const TrainingModel = mongoose.model("Training", trainingSchema)
+const TrainingModel = mongoose.model("Training", trainingSchema);
 
-module.exports = TrainingModel
+module.exports = TrainingModel;

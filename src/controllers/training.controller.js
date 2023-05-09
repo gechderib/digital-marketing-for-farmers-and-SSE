@@ -8,9 +8,10 @@ const addTraining = async (req, res) => {
       ...req.body,
       postedBy: req.userId,
     });
+
     const response = await newTraining.save();
     if (response) {
-      res.status(201).send({ message: "Training successfully added" });
+      res.status(201).send(response);
       return;
     }
     res.status(400).send({ message: "can't add training" });
@@ -44,6 +45,7 @@ const getTrainings = async (req, res) => {
           title: { $last: "$title" },
           description: { $last: "$description" },
           mediaFile: { $last: "$mediaFile" },
+          createdAt: { $last: "$createdAt" },
           postedBy: {
             $last: {
               _id: "$postedBy._id",
@@ -74,7 +76,7 @@ const getTraining = async (req, res) => {
   try {
     const { id } = req.params;
     const training = await TrainingModel.aggregate([
-      {$match: {_id: new ObjectId(id)}},
+      { $match: { _id: new ObjectId(id) } },
       {
         $lookup: {
           from: "users",
@@ -91,8 +93,8 @@ const getTraining = async (req, res) => {
         $group: {
           _id: "$_id",
           title: { $last: "$title" },
-          description: {$last: "$description"},
-          mediaFile: {$last: "$mediaFile"},
+          description: { $last: "$description" },
+          mediaFile: { $last: "$mediaFile" },
           postedBy: {
             $last: {
               _id: "$postedBy._id",
@@ -124,7 +126,14 @@ const updateTraining = async (req, res) => {
       req.body
     );
     if (response) {
-      res.status(201).send({ message: "training successfully updated" });
+      console.log(response.createdAt)
+      res
+        .status(201)
+        .send({
+          message: "training successfully updated",
+          id: id,
+          data:{...req.body, createdAt:response.createdAt}
+        });
       return;
     }
     res.status(400).send({ message: "data not found to update" });
@@ -141,7 +150,7 @@ const deletTraining = async (req, res) => {
     const response = await TrainingModel.deleteOne({ _id: id });
     const comment = await CommentModel.deleteMany({ training: id });
     if (response && comment) {
-      res.status(200).send({ message: "data is successfully deleted" });
+      res.status(200).send({ message: "data is successfully deleted", id: id });
       return;
     }
     res.status(400).send({ message: "product not found" });

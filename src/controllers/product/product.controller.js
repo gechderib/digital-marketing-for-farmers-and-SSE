@@ -4,10 +4,12 @@ const ProductModel = require("../../models/product.model");
 
 const addProduct = async (req, res) => {
   try {
+    console.log("back back end")
+
     const newProduct = new ProductModel({ ...req.body, postedBy: req.userId });
     const response = await newProduct.save();
     if (response) {
-      res.status(201).send({ message: "product successfully added" });
+      res.status(201).send(response);
       return;
     }
     res.status(400).send({ message: "can't add the product" });
@@ -46,6 +48,7 @@ const getAllProducts = async (req, res) => {
               _id: "$postedBy._id",
               firstName: "$postedBy.firstName",
               lastName: "$postedBy.lastName",
+              phoneNumber:"$postedBy.phoneNumber",
               roles: "$postedBy.roles",
               profilePicture:"$postedBy.profilePicture"
             },
