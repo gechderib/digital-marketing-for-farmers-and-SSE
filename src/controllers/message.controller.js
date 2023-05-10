@@ -62,6 +62,8 @@ const getMessages = async (req, res) => {
         $group: {
           _id: "$_id",
           message: { $last: "$message" },
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last:"$updatedAt"},
           sender: {
             $last: {
               _id: "$sender._id",
@@ -159,6 +161,8 @@ const getYourMessage = async (req, res) => {
         $group: {
           _id: "$_id",
           message: { $last: "$message" },
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last:"$updatedAt"},
           sender: {
             $last: {
               _id: "$sender._id",
@@ -229,6 +233,8 @@ const getSavedMessage = async (req, res) => {
         $group: {
           _id: "$_id",
           message: { $last: "$message" },
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last:"$updatedAt"},
           sender: {
             $last: {
               _id: "$sender._id",

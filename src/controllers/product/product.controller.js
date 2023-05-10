@@ -119,6 +119,7 @@ const getProduct = async (req, res) => {
 
 const getMyProduct = async (req, res) => {
   try {
+    console.log(req.userId)
     const product = await ProductModel.aggregate([
       {$match: {postedBy: new ObjectId(req.userId)}},
       {
@@ -139,6 +140,8 @@ const getMyProduct = async (req, res) => {
           price: { $last: "$price" },
           amount: { $last: "$amount" },
           soldout: { $last: "$soldout" },
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last: "$updatedAt"},
           postedBy: {
             $last: {
               _id: "$postedBy._id",
@@ -170,8 +173,15 @@ const updateProduct = async (req, res) => {
     const { id } = req.params;
 
     const response = await ProductModel.findByIdAndUpdate(id, req.body);
+    
     if (response) {
-      res.status(201).send({ message: "product successfully updated" });
+      data = {
+        ...req.body,
+        _id:id,
+        soldout:response.soldout
+      }
+      console.log(req.body)
+      res.status(201).send({ message: "product successfully updated", data });
       return;
     }
     res.status(400).send({ message: "can't update the data" });
@@ -190,7 +200,7 @@ const deleteProduct = async (req, res) => {
     const order = await OrderModel.deleteMany({ product: id });
     if (response && order) {
       res.status(200).send({
-        message: "product and their respective orders are successfully deleted",
+        message: "product and their respective orders are successfully deleted", id:id
       });
       return;
     }

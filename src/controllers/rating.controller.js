@@ -118,6 +118,8 @@ const getProductOwnerPreviousRate = async (req, res) => {
           _id: "$_id",
           rate: { $last: "$rate" },
           feedback:{$last: "$feedback"},
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last:"$updatedAt"},
           productOwner: {
             $last: {
               _id: "$productOwner._id",

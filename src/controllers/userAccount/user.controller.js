@@ -20,7 +20,7 @@ const getUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
-    const users = await UserModel.find({},{password:0});
+    const users = await UserModel.find({}, {});
     if (users) {
       res.status(200).send(users);
       return;
@@ -34,7 +34,7 @@ const getAllUsers = async (req, res) => {
 
 const getAllFarmers = async (req, res) => {
   try {
-    const users = await UserModel.find({ roles: "farmer" },{password: 0});
+    const users = await UserModel.find({ roles: "farmer" }, { password: 0 });
     if (users) {
       res.status(200).send(users);
       return;
@@ -58,7 +58,16 @@ const updateUser = async (req, res) => {
       res.status(400).send({ message: `can't update with id ${id}` });
       return;
     } else {
-      res.status(201).send({ message: "data successfully updated" });
+      const data = {
+        ...req.body,
+        _id: id,
+        createdAt: response.createdAt,
+        profilePicture: response.profilePicture,
+        verified: response.verified,
+        identifictionPicture: response.identifictionPicture,
+      };
+     
+      res.status(201).send({ message: "data successfully updated", data });
       return;
     }
   } catch (err) {
@@ -79,9 +88,8 @@ const deleteUser = async (req, res) => {
         res.status(400).send({ message: `user with id ${id} not found` });
         return;
       }
-    }
-    else {
-        res.status(400).send({message:"wrong id"})
+    } else {
+      res.status(400).send({ message: "wrong id" });
     }
   } catch (err) {
     res.status(500).send({ message: err.message });

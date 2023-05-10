@@ -8,7 +8,7 @@ const productRoute = (app) => {
     router.post("/addProduct",[verifyToken, canAddProduct], addProduct)
     router.get("/products", getAllProducts)
     router.get("/product/:id",getProduct)
-    router.get("/myProduct/",getMyProduct)
+    router.get("/myProduct",[verifyToken],getMyProduct)
     router.patch("/product/:id",[verifyToken, changeProduct],updateProduct)
     router.delete("/product/:id",[verifyToken, changeProduct],deleteProduct)
 

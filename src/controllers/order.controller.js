@@ -76,6 +76,8 @@ const getOrders = async (req, res) => {
           offerPrice: {$last: "$offerPrice"},
           accepted: { $last: "$accepted" },
           canRate: { $last: "$canRate" },
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last:"$updatedAt"},
           orderBy: {
             $last: {
               _id: "$orderBy._id",
@@ -140,6 +142,8 @@ const getOrder = async (req, res) => {
           offerPrice: {$last: "$offerPrice"},
           accepted: { $last: "$accepted" },
           canRate: { $last: "$canRate" },
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last:"$updatedAt"},
           orderBy: {
             $last: {
               _id: "$orderBy._id",
@@ -203,6 +207,8 @@ const getMyOrders = async (req, res) => {
           offerPrice: {$last: "$offerPrice"},
           accepted: { $last: "$accepted" },
           canRate: { $last: "$canRate" },
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last:"$updatedAt"},
           orderBy: {
             $last: {
               _id: "$orderBy._id",
@@ -268,6 +274,8 @@ const myOffer = async (req, res) => {
           offerPrice:{$last:"$offerPrice"},
           accepted: { $last: "$accepted" },
           canRate: { $last: "$canRate" },
+          createdAt:{$last:"$createdAt"},
+          updatedAt: {$last:"$updatedAt"},
           orderBy: {
             $last: {
               _id: "$orderBy._id",

@@ -8,7 +8,7 @@ const signupSchema = mongoose.Schema(
     phoneNumber: {type:String, required:true, unique:true},
     password: {type: String, required:true},
     roles: {type:[String], default:["customer"]},
-    profilePicture:{type: String},
+    profilePicture:{type: String, default:"https://via.placeholder.com/250"},
     identifictionPicture:{type:String, required: isSseOrFarmer},
     verified:{type: Boolean, default:false}
   },

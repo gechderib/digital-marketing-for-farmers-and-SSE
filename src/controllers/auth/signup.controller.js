@@ -6,7 +6,7 @@ const signup = async (req, res) => {
         const newUser = new UserModel(req.body)
         const response = await newUser.save(newUser)
         if(response){
-            res.status(201).json({message:"user successfully registered"})
+            res.status(201).json({message:"user successfully registered", data:response})
             return
         }
     }catch(err){
