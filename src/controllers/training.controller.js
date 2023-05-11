@@ -25,7 +25,7 @@ const addTraining = async (req, res) => {
 const getTrainings = async (req, res) => {
   try {
     const page = req.query.p || 0;
-    const trainingPerPage = 5;
+    const trainingPerPage = 10;
     const trainings = await TrainingModel.aggregate([
       {
         $lookup: {

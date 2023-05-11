@@ -21,7 +21,7 @@ const addProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   const page = req.query.p || 0;
-  const productsPerPage = 5;
+  const productsPerPage = 10;
   try {
     const product = await ProductModel.aggregate([
       {
