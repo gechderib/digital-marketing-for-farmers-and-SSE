@@ -15,6 +15,8 @@ const checkDuplicatedPhoneNumberOrEmail = async (req, res, next) => {
   }
 };
 
+
+
 const checkRoleExist = async (req, res, next) => {
   if (req.body.roles) {
     let roleCount = req.body.roles.length;

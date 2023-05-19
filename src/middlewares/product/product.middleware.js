@@ -4,6 +4,7 @@ const MessageModel = require("../../models/message.model");
 const ProductModel = require("../../models/product.model");
 const RatingModel = require("../../models/rating.model");
 const OrderModel = require("../../models/order.model");
+const { Status } = require("../../models");
 
 const changeUserAccount = async (req, res, next) => {
   try {
@@ -183,8 +184,8 @@ const canRate = async (req, res, next) => {
     const order = await OrderModel.findOne({
       orderBy: req.userId,
       product: productId,
-      accepted: true,
-      canRate: true,
+      accepted: "accepted",
+      canRate: "accepted",
     });
     if (!order) {
       res
@@ -203,7 +204,16 @@ const canRate = async (req, res, next) => {
   }
 };
 
+const checkStatusExist = async (req, res, next) => {
+  if(!Status.includes(req.body.accepted)){
+    res.status(400).send({message: `${req.body.accepted} status doesn't exist`});
+    return
+  }
+  next()
+};
+
 module.exports = {
+  checkStatusExist,
   changeUserAccount,
   changeProduct,
   canAddProduct,

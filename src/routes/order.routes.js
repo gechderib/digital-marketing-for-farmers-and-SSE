@@ -8,18 +8,18 @@ const {
   updateOrder,
 } = require("../controllers/order.controller");
 const { verifyToken, isAdmin } = require("../middlewares/auth/authJwt");
-const { changeOrder } = require("../middlewares/product/product.middleware");
+const { changeOrder, checkStatusExist } = require("../middlewares/product/product.middleware");
 
 const orderRoute = (app) => {
   const router = require("express").Router();
 
-  router.post("/order/:productId", [verifyToken], addOrder);
+  router.post("/order/:productId", [verifyToken, checkStatusExist], addOrder);
   router.get("/orders", [verifyToken, isAdmin], getOrders);
   router.get("/order/:id", [verifyToken], getOrder);
   router.get("/myOrders", [verifyToken], getMyOrders);
   router.get("/myOffers", [verifyToken], myOffer);
   router.delete("/order/:id", [verifyToken, changeOrder], deleteOrder);
-  router.patch("/order/:id", [verifyToken, changeOrder], updateOrder);
+  router.patch("/order/:id", [verifyToken, changeOrder, checkStatusExist], updateOrder);
 
   app.use("/api/dmfsse", router);
 };

@@ -15,8 +15,8 @@ const orderSchema = mongoose.Schema(
     },
     quantity: { type: Number, required: true },
     offerPrice:{type: Number, required: true},
-    accepted: { type: Boolean, default: false },
-    canRate: {type: Boolean, default:false}
+    accepted: { type: String, default: "pending" },
+    canRate: {type: String, default:"pending"}
   },
   {
     timestamps: true,
