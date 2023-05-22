@@ -205,6 +205,7 @@ const canRate = async (req, res, next) => {
 };
 
 const checkStatusExist = async (req, res, next) => {
+  console.log(req.body)
   if(!Status.includes(req.body.accepted)){
     res.status(400).send({message: `${req.body.accepted} status doesn't exist`});
     return

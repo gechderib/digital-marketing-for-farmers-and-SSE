@@ -13,7 +13,7 @@ const { changeOrder, checkStatusExist } = require("../middlewares/product/produc
 const orderRoute = (app) => {
   const router = require("express").Router();
 
-  router.post("/order/:productId", [verifyToken, checkStatusExist], addOrder);
+  router.post("/order/:productId", [verifyToken], addOrder);
   router.get("/orders", [verifyToken, isAdmin], getOrders);
   router.get("/order/:id", [verifyToken], getOrder);
   router.get("/myOrders", [verifyToken], getMyOrders);
