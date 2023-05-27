@@ -24,7 +24,9 @@ const sendMessage = async (req, res) => {
     }
     const response = await newMessage.save();
     if (response) {
-      res.status(201).send({ message: "message successfully send" });
+      console.log(response)
+      const message = await MessageModel.findById({_id: response._id}).populate("sender").populate("reciever")
+      res.status(201).send(message);
       return;
     }
     res.status(400).send({ message: "message not found" });
