@@ -94,6 +94,7 @@ const getProduct = async (req, res) => {
           price: { $last: "$price" },
           amount: { $last: "$amount" },
           soldout: { $last: "$soldout" },
+          photo: {$last: "$photo" },
           postedBy: {
             $last: {
               _id: "$postedBy._id",
