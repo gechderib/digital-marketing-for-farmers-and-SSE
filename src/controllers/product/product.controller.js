@@ -99,7 +99,9 @@ const getProduct = async (req, res) => {
               _id: "$postedBy._id",
               firstName: "$postedBy.firstName",
               lastName: "$postedBy.lastName",
+              phoneNumber:"$postedBy.phoneNumber",
               roles: "$postedBy.roles",
+              profilePicture:"$postedBy.profilePicture"
             },
           },
         },
@@ -147,7 +149,9 @@ const getMyProduct = async (req, res) => {
               _id: "$postedBy._id",
               firstName: "$postedBy.firstName",
               lastName: "$postedBy.lastName",
+              phoneNumber:"$postedBy.phoneNumber",
               roles: "$postedBy.roles",
+              profilePicture:"$postedBy.profilePicture"
             },
           },
         },
