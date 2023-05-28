@@ -292,6 +292,7 @@ const myOffer = async (req, res) => {
               price:"$product.price",
               description: "$product.description",
               postedBy: "$product.postedBy",
+              photo: "$product.photo"
             },
           },
         },
