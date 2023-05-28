@@ -308,7 +308,8 @@ const myOffer = async (req, res) => {
       res.status(200).send(myOffers);
       return;
     }
-    res.status(400).send({ message: "offer not found" });
+
+    res.status(400).send(myOffers);
     return;
   } catch (err) {
     res.status(500).send({ message: err.message });
