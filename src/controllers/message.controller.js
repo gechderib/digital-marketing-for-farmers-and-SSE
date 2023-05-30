@@ -25,7 +25,58 @@ const sendMessage = async (req, res) => {
     const response = await newMessage.save();
     if (response) {
       console.log(response)
-      const message = await MessageModel.findById({_id: response._id}).populate("sender").populate("reciever")
+      // const message = await MessageModel.findById({_id: response._id}).populate("sender").populate("reciever")
+      const message = await MessageModel.aggregate([
+        {
+          $match: {
+            _id: new ObjectId(response._id),
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            foreignField: "_id",
+            localField: "sender",
+            as: "sender",
+          },
+        },
+        { $unwind: "$sender" },
+        {
+          $lookup: {
+            from: "users",
+            foreignField: "_id",
+            localField: "reciever",
+            as: "reciever",
+          },
+        },
+        { $unwind: "$reciever" },
+        { $unwind: "$sender.roles" },
+        { $unwind: "$reciever.roles" },
+        {
+          $group: {
+            _id: "$_id",
+            message: { $last: "$message" },
+            createdAt:{$last:"$createdAt"},
+            updatedAt: {$last:"$updatedAt"},
+            sender: {
+              $last: {
+                _id: "$sender._id",
+                firstName: "$sender.firstName",
+                lastName: "$sender.lastName",
+                roles: "$sender.roles",
+              },
+            },
+            reciever: {
+              $last: {
+                _id: "$reciever._id",
+                firstName: "$reciever.firstName",
+                lastName: "$reciever.lastName",
+                roles: "$reciever.roles",
+              },
+            },
+          },
+        },
+      ]);
       res.status(201).send(message);
       return;
     }
