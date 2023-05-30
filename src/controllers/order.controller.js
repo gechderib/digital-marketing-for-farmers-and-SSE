@@ -392,7 +392,58 @@ const updateOrder = async (req, res) => {
 
     const response = await OrderModel.findByIdAndUpdate(id, req.body);
     if (response) {
-      res.status(201).send({ message: "order successfully updated" });
+      const myOrders = await OrderModel.aggregate([
+        {$match: { _id: new ObjectId(response._id)}},
+        {
+          $lookup: {
+            from: "users",
+            foreignField: "_id",
+            localField: "orderBy",
+            as: "orderBy",
+          },
+        },
+        { $unwind: "$orderBy" },
+        {
+          $lookup: {
+            from: "products",
+            foreignField: "_id",
+            localField: "product",
+            as: "product",
+          },
+        },
+        { $unwind: "$product" },
+        {
+          $group: {
+            _id: "$_id",
+            quantity: { $last: "$quantity" },
+            offerPrice: {$last: "$offerPrice"},
+            accepted: { $last: "$accepted" },
+            canRate: { $last: "$canRate" },
+            createdAt:{$last:"$createdAt"},
+            updatedAt: {$last:"$updatedAt"},
+            orderBy: {
+              $last: {
+                _id: "$orderBy._id",
+                firstName: "$orderBy.firstName",
+                lastName: "$orderBy.lastName",
+                roles: "$orderBy.roles",
+              },
+            },
+            product: {
+              $last: {
+                _id: "$product._id",
+                name: "$product.name",
+                price:"$product.price",
+                description: "$product.description",
+                postedBy: "$product.postedBy",
+                photo:"$product.photo"
+                  
+              },
+            },
+          },
+        },
+      ]);
+      res.status(201).send(myOrders);
       return;
     }
     res.status(400).send({ message: "ordernot found" });
