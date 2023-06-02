@@ -11,6 +11,7 @@ const userRoute = (app) => {
     router.get("/allfarmers",[verifyToken, isAgent], getAllFarmers)
     router.delete("/user/:id",[verifyToken, changeUserAccount],deleteUser)
     router.patch("/user/:id",[verifyToken, changeUserAccount],updateUser)
+    router.patch("/forgotpassword",updateUser)
 
     app.use("/api/dmfsse", router)
 }
