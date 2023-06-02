@@ -6,7 +6,7 @@ const userRoute = (app) => {
     const router = require("express").Router()
 
     router.get("/user/:id",[verifyToken],getUser)
-    router.get("/userByPhoneNumber",getUserByPhone)
+    router.get("/userByPhoneNumber/:phoneNumber",getUserByPhone)
     router.get("/users",[verifyToken,isAdmin],getAllUsers)
     router.get("/allfarmers",[verifyToken, isAgent], getAllFarmers)
     router.delete("/user/:id",[verifyToken, changeUserAccount],deleteUser)
