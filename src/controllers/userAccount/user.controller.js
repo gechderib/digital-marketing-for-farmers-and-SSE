@@ -20,13 +20,14 @@ const getUser = async (req, res) => {
 
 
 const getUserByPhone = async (req, res) => {
+  const {phoneNumber} = req.params
   try {
-    const user = await UserModel.findOne({ phoneNumber: req.body.phoneNumber },{password: 0});
+    const user = await UserModel.findOne({ phoneNumber },{password: 0});
     if (user) {
       res.status(200).json(user);
       return;
     }
-    res.status(404).send({ message: `user with phone number ${req.body.phoneNumber} not found!!` });
+    res.status(404).send({ message: `user with phone number ${phoneNumber} not found!!` });
     return;
   } catch (err) {
     res.status(500).send({ message: err.message });
