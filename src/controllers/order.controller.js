@@ -83,7 +83,9 @@ const addOrder = async (req, res) => {
                 price:"$product.price",
                 description: "$product.description",
                 postedBy: "$product.postedBy",
-                photo:"$product.photo"
+                photo:"$product.photo",
+                soldout:"$product.soldout",
+                amount:"$product.amount"
                   
               },
             },
@@ -147,6 +149,9 @@ const getOrders = async (req, res) => {
               price:"$product.price",
               description: "$product.description",
               postedBy: "$product.postedBy", 
+              photo:"$product.photo",
+              soldout:"$product.soldout",
+              amount:"$product.amount"
             },
           },
         },
@@ -215,6 +220,9 @@ const getOrder = async (req, res) => {
               price:"$product.price",
               description: "$product.description",
               postedBy: "$product.postedBy",
+              photo:"$product.photo",
+              soldout:"$product.soldout",
+              amount:"$product.amount"
             },
           },
         },
@@ -281,7 +289,9 @@ const getMyOrders = async (req, res) => {
               price:"$product.price",
               description: "$product.description",
               postedBy: "$product.postedBy",
-              photo:"$product.photo"
+              photo:"$product.photo",
+              soldout:"$product.soldout",
+              amount:"$product.amount"
                 
               
             },
@@ -350,7 +360,9 @@ const myOffer = async (req, res) => {
               price:"$product.price",
               description: "$product.description",
               postedBy: "$product.postedBy",
-              photo: "$product.photo"
+              photo:"$product.photo",
+              soldout:"$product.soldout",
+              amount:"$product.amount"
             },
           },
         },
@@ -443,7 +455,9 @@ const updateOrder = async (req, res) => {
                 price:"$product.price",
                 description: "$product.description",
                 postedBy: "$product.postedBy",
-                photo:"$product.photo"
+                photo:"$product.photo",
+                soldout:"$product.soldout",
+                amount:"$product.amount"
                   
               },
             },

@@ -9,7 +9,7 @@ const productRoute = (app) => {
     router.get("/products", getAllProducts)
     router.get("/product/:id",getProduct)
     router.get("/myProduct",[verifyToken],getMyProduct)
-    router.patch("/product/:id",[verifyToken, changeProduct],updateProduct)
+    router.patch("/product/:id",[verifyToken],updateProduct)
     router.delete("/product/:id",[verifyToken, changeProduct],deleteProduct)
 
     app.use("/api/dmfsse", router)
