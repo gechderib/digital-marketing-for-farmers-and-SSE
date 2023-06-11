@@ -24,6 +24,8 @@ const getAllProducts = async (req, res) => {
   const productsPerPage = 10;
   try {
     const product = await ProductModel.aggregate([
+      {$match: {amount: {$gt: 0}}},
+      {$match: {soldout: false}},
       {
         $lookup: {
           from: "users",
@@ -76,6 +78,8 @@ const getProduct = async (req, res) => {
 
     const product = await ProductModel.aggregate([
       {$match: {_id: new ObjectId(id)}},
+      {$match: {amount: {$gt: 0}}},
+      {$match: {soldout: false}},
       {
         $lookup: {
           from: "users",
@@ -124,6 +128,8 @@ const getMyProduct = async (req, res) => {
   try {
     const product = await ProductModel.aggregate([
       {$match: {postedBy: new ObjectId(req.userId)}},
+      {$match: {amount: {$gt: 0}}},
+      {$match: {soldout: false}},
       {
         $lookup: {
           from: "users",
