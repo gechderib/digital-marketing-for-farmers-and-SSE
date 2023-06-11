@@ -9,8 +9,8 @@ const userRoute = (app) => {
     router.get("/userByPhoneNumber/:phoneNumber",getUserByPhone)
     router.get("/users",[verifyToken,isAdmin],getAllUsers)
     router.get("/allfarmers",[verifyToken, isAgent], getAllFarmers)
-    router.delete("/user/:id",[verifyToken, changeUserAccount],deleteUser)
-    router.patch("/user/:id",[verifyToken, changeUserAccount],updateUser)
+    router.delete("/user/:id",[verifyToken, ],deleteUser)
+    router.patch("/user/:id",[verifyToken, ],updateUser)
     router.patch("/forgotpassword/:id",updateUser)
 
     app.use("/api/dmfsse", router)
