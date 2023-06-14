@@ -23,12 +23,10 @@ const addPayment = async (req, res) => {
       }
     );
     
-    if(response.data.status == "success"){
-      res.status(200).send(response.data);
-    }
-    if(response.data.status == "failed"){
-      res.status(400).send({status:"failed"})
-    }
+    
+      res.status(200).send(response);
+    
+
     
   } catch (err) {
 
