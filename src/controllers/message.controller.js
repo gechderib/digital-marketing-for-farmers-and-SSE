@@ -190,6 +190,7 @@ const getYourMessage = async (req, res) => {
           ],
         },
       },
+      { $sort: { createdAt: -1 } },
       {
         $lookup: {
           from: "users",
@@ -262,6 +263,7 @@ const getSavedMessage = async (req, res) => {
           ],
         },
       },
+      { $sort: { createdAt: -1 } },
       {
         $lookup: {
           from: "users",

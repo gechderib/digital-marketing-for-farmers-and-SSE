@@ -26,6 +26,7 @@ const getAllProducts = async (req, res) => {
     const product = await ProductModel.aggregate([
       {$match: {amount: {$gt: 0}}},
       {$match: {soldout: false}},
+      { $sort: { createdAt: -1 } },
       {
         $lookup: {
           from: "users",
@@ -130,6 +131,7 @@ const getMyProduct = async (req, res) => {
       {$match: {postedBy: new ObjectId(req.userId)}},
       {$match: {amount: {$gt: 0}}},
       {$match: {soldout: false}},
+      { $sort: { updatedAt: -1 } },
       {
         $lookup: {
           from: "users",
