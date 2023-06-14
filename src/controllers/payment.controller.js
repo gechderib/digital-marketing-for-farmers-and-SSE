@@ -24,7 +24,7 @@ const addPayment = async (req, res) => {
     );
     
     if(response.data.status == "success"){
-      res.redirect(303, response.data.data.checkout_url);
+      res.status(200).send(response.data);
     }
     if(response.data.status == "failed"){
       res.status(400).send({status:"failed"})
